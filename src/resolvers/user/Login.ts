@@ -14,6 +14,7 @@ export class LoginResolver {
         const user = await User.findOne({ where: { email } })
 
         if (!user) return undefined
+        if (!user.confirmed) return undefined
 
         const decoded = await bcrypt.compare(password, user.password)
 

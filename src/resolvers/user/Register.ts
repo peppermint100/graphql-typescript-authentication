@@ -2,6 +2,8 @@ import { RegisterRequest } from './register/RegisterRequest';
 import { Resolver, Query, Mutation, Arg, } from "type-graphql"
 import bcrypt from "bcryptjs"
 import { User } from "./../../entities/User"
+import { sendEmail } from './../../utils/sendEmail';
+import { createConfirmationUrl } from './../../utils/createConfirmationUrl';
 
 @Resolver()
 export class RegisterResolver {
@@ -24,6 +26,8 @@ export class RegisterResolver {
             email,
             password: hashedPassword
         }).save();
+
+        await sendEmail(email, await createConfirmationUrl(user.id))
 
         return user;
     }

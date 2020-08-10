@@ -1,3 +1,4 @@
+import { ConfirmUserResolver } from './resolvers/user/ConfirmUser';
 import "reflect-metadata"
 import { ApolloServer } from "apollo-server-express"
 import { buildSchema } from "type-graphql"
@@ -19,7 +20,7 @@ const main = async () => {
     await createConnection()
 
     const schema = await buildSchema({
-        resolvers: [RegisterResolver, LoginResolver, MeResolver],
+        resolvers: [RegisterResolver, LoginResolver, MeResolver, ConfirmUserResolver],
     })
     const apolloServer = new ApolloServer({
         schema,
