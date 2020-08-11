@@ -1,4 +1,3 @@
-import { ConfirmUserResolver } from './resolvers/user/ConfirmUser';
 import "reflect-metadata"
 import { ApolloServer } from "apollo-server-express"
 import { buildSchema } from "type-graphql"
@@ -8,10 +7,6 @@ import { createConnection } from "typeorm"
 import express from "express"
 import cors from "cors"
 
-import { RegisterResolver } from "./resolvers/user/Register"
-import { LoginResolver } from "./resolvers/user/Login"
-import { MeResolver } from './resolvers/user/Me';
-
 import session from "express-session"
 import connectRedis from "connect-redis"
 import { redis } from "./redis"
@@ -20,11 +15,11 @@ const main = async () => {
     await createConnection()
 
     const schema = await buildSchema({
-        resolvers: [RegisterResolver, LoginResolver, MeResolver, ConfirmUserResolver],
+        resolvers: [__dirname + "/resolvers/**/*.ts"]
     })
     const apolloServer = new ApolloServer({
         schema,
-        context: ({ req }: any) => ({ req })
+        context: ({ req, res }: any) => ({ req, res })
     })
     const app = express()
     const RedisStore = connectRedis(session)
