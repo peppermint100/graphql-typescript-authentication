@@ -1,8 +1,8 @@
 import "reflect-metadata"
 import { ApolloServer } from "apollo-server-express"
-import { buildSchema } from "type-graphql"
 
 import { createConnection } from "typeorm"
+import { createSchema } from './createSchema';
 
 import express from "express"
 import cors from "cors"
@@ -11,22 +11,28 @@ import session from "express-session"
 import connectRedis from "connect-redis"
 import { redis } from "./redis"
 
+import { graphqlUploadExpress } from 'graphql-upload';
+import { graphqlHTTP } from "express-graphql"
+
 const main = async () => {
     await createConnection()
 
-    const schema = await buildSchema({
-        resolvers: [__dirname + "/resolvers/**/*.ts"]
-    })
+    const schema = await createSchema()
+
     const apolloServer = new ApolloServer({
         schema,
-        context: ({ req, res }: any) => ({ req, res })
+        context: ({ req, res }: any) => ({ req, res }),
+        uploads: false
     })
+
     const app = express()
     const RedisStore = connectRedis(session)
 
-    app.use(cors({
-        credentials: true,
-    }))
+    app.use('/graphql', graphqlUploadExpress({ maxFileSize: 10000000, maxFiles: 10 }), graphqlHTTP({ schema }))
+    app.use(express.json())
+    app.use(express.urlencoded({ extended: false }))
+    app.use(cors())
+
 
     app.use(session({
         store: new RedisStore({
@@ -50,5 +56,5 @@ const main = async () => {
 
 }
 
-
 main()
+
