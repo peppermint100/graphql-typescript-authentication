@@ -10,3 +10,8 @@
 ...
 
 
+### Postman Settings when use fileupload resolver
+
+- operations: {"query":"mutation FileUpload ($picture: Upload!){\n  uploadImage(picture: $picture)\n}"})
+- map: {"0": ["variables.picture"]} => picture needs to match with mutation parameter 
+- 0 : file.jpg => set hashmap in formdata
